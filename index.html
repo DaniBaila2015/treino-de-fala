@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treino de Fala: Países</title>
+    <style>
+        body {
+            background-color: #1c1c1e;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 90vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            gap: 40px;
+        }
+        .bandeira {
+            font-size: 100px;
+            line-height: 1;
+        }
+        .pista {
+            font-size: 40px;
+            letter-spacing: 2px;
+            color: #ff453a;
+            font-weight: normal;
+        }
+        .negrito {
+            font-weight: bold;
+        }
+        .feedback {
+            font-size: 16px;
+            color: #eaeaea;
+            text-align: center;
+            min-height: 20px;
+        }
+        .botao-falar {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 80%;
+            max-width: 400px;
+            justify-content: center;
+            transition: background-color 0.2s;
+            margin-bottom: 20px;
+        }
+        .botao-falar.gravando {
+            background-color: #ff3b30;
+            animation: pulsar 1.5s infinite;
+        }
+        @keyframes pulsar {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Treino de Fala: Países 🗣️</h1>
+
+    <div class="container">
+        <div id="bandeira" class="bandeira">🇧🇷</div>
+        <div id="pista-content" class="pista"></div>
+        <div id="feedback" class="feedback">Clica no botão e diz o nome do país!</div>
+    </div>
+
+    <button id="btn-falar" class="botao-falar" onclick="alternarGravacao()">
+        <span id="btn-icone">🎤</span> <span id="btn-texto">Falar Agora</span>
+    </button>
+
+    <script>
+        // LISTA DE PAÍSES DO TEU CÓDIGO SWIFT
+        const paises = [
+            { nome: "Brasil", imagem: "🇧🇷", pista: [ {t: "B ", n: true}, {t: "_ _ ", n: false}, {t: "s ", n: true}, {t: "_ _", n: false} ], completo: [ {t: "B", n: true}, {t: "ra", n: false}, {t: "s", n: true}, {t: "il", n: false} ] },
+            { nome: "França", imagem: "🇫🇷", pista: [ {t: "_ ", n: false}, {t: "r ", n: true}, {t: "_ _ ", n: false}, {t: "ça", n: true} ], completo: [ {t: "F", n: false}, {t: "r", n: true}, {t: "an", n: false}, {t: "ça", n: true} ] },
+            { nome: "Chile", imagem: "🇨🇱", pista: [ {t: "Ch ", n: true}, {t: "_ _ _", n: false} ], completo: [ {t: "Ch", n: true}, {t: "ile", n: false} ] },
+            { nome: "Marrocos", imagem: "🇲🇦", pista: [ {t: "_ _ ", n: false}, {t: "rro ", n: true}, {t: "_ _ ", n: false}, {t: "s", n: true} ], completo: [ {t: "Ma", n: false}, {t: "rro", n: true}, {t: "co", n: false}, {t: "s", n: true} ] },
+            { nome: "Suíça", imagem: "🇨🇭", pista: [ {t: "S ", n: true}, {t: "_ _ ", n: false}, {t: "ça", n: true} ], completo: [ {t: "S", n: true}, {t: "uí", n: false}, {t: "ça", n: true} ] },
+            { nome: "México", imagem: "🇲🇽", pista: [ {t: "_ _ ", n: false}, {t: "xi ", n: true}, {t: "_ _", n: false} ], completo: [ {t: "Mé", n: false}, {t: "xi", n: true}, {t: "co", n: false} ] },
+            { nome: "Rússia", imagem: "🇷🇺", pista: [ {t: "Rú ", n: true}, {t: "ss ", n: true}, {t: "_ _", n: false} ], completo: [ {t: "Rú", n: true}, {t: "ss", n: true}, {t: "ia", n: false} ] },
+            { nome: "Moçambique", imagem: "🇲🇿", pista: [ {t: "_ _ ", n: false}, {t: "ç ", n: true}, {t: "_ _ _ _ _ _ _ _", n: false} ], completo: [ {t: "Mo", n: false}, {t: "ç", n: true}, {t: "ambi", n: false}, {t: "que", n: false} ] },
+            { nome: "Zâmbia", imagem: "🇿🇲", pista: [ {t: "Z ", n: true}, {t: "_ _ _ _ _", n: false} ], completo: [ {t: "Z", n: true}, {t: "âmbia", n: false} ] },
+            { nome: "Escócia", imagem: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", pista: [ {t: "_ ", n: false}, {t: "sc ", n: true}, {t: "_ _ _ _", n: false} ], completo: [ {t: "E", n: false}, {t: "sc", n: true}, {t: "ócia", n: false} ] }
+        ];
+
+        let indiceAtual = 0;
+        let estaAGravar = false;
+        let reconhecimento;
+
+        // Configurar o reconhecimento de voz do Navegador
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            reconhecimento = new SpeechRecognition();
+            reconhecimento.lang = 'pt-PT';
+            reconhecimento.interimResults = false;
+            reconhecimento.maxAlternatives = 1;
+
+            reconhecimento.onresult = (event) => {
+                const textoDito = event.results[0][0].transcript.trim();
+                verificarResposta(textoDito);
+            };
+
+            reconhecimento.onerror = () => {
+                pararEstiloGravacao();
+                document.getElementById("feedback").innerText = "Erro ao ouvir. Tenta novamente!";
+            };
+
+            reconhecimento.onend = () => {
+                if (estaAGravar) pararEstiloGravacao();
+            };
+        } else {
+            document.getElementById("feedback").innerText = "O teu navegador não suporta reconhecimento de voz.";
+        }
+
+        function carregarPais() {
+            const pais = paises[indiceAtual];
+            document.getElementById("bandeira").innerText = pais.imagem;
+            
+            const pistaDiv = document.getElementById("pista-content");
+            pistaDiv.innerHTML = "";
+            
+            pais.pista.forEach(seg => {
+                const span = document.createElement("span");
+                span.innerText = seg.t;
+                if (seg.n) span.classList.add("negrito");
+                pistaDiv.appendChild(span);
+            });
+            
+            document.getElementById("feedback").innerText = "Clica no botão e diz o nome do país!";
+            document.getElementById("feedback").style.color = "#eaeaea";
+        }
+
+        function alternarGravacao() {
+            if (!reconhecimento) return;
+
+            if (estaAGravar) {
+                reconhecimento.stop();
+                pararEstiloGravacao();
+            } else {
+                estaAGravar = true;
+                document.getElementById("btn-falar").classList.add("gravando");
+                document.getElementById("btn-texto").innerText = "A ouvir...";
+                document.getElementById("feedback").innerText = "Podes falar agora...";
+                reconhecimento.start();
+            }
+        }
+
+        function pararEstiloGravacao() {
+            estaAGravar = false;
+            document.getElementById("btn-falar").classList.remove("gravando");
+            document.getElementById("btn-texto").innerText = "Falar Agora";
+        }
+
+        function verificarResposta(resposta) {
+            const nomeCorreto = paises[indiceAtual].nome.toLowerCase();
+            const nomeDito = resposta.toLowerCase();
+
+            // Mostra o texto completo revelado
+            const pistaDiv = document.getElementById("pista-content");
+            pistaDiv.innerHTML = "";
+            paises[indiceAtual].completo.forEach(seg => {
+                const span = document.createElement("span");
+                span.innerText = seg.t;
+                if (seg.n) span.classList.add("negrito");
+                pistaDiv.appendChild(span);
+            });
+
+            if (nomeDito.includes(nomeCorreto) || nomeCorreto.includes(nomeDito)) {
+                // Tocar som de sucesso do navegador
+                tocarSomSucesso();
+                document.getElementById("feedback").innerText = `Boa! Disseste: "${resposta}" 🎉`;
+                document.getElementById("feedback").style.color = "#30d158";
+
+                // Avança para o próximo país após 2 segundos
+                setTimeout(() => {
+                    indiceAtual = (indiceAtual + 1) % paises.length;
+                    carregarPais();
+                }, 2500);
+            } else {
+                document.getElementById("feedback").innerText = `Quase! Disseste "${resposta}". Tenta outra vez!`;
+                document.getElementById("feedback").style.color = "#ff453a";
+                
+                // Volta a colocar a pista original após 2 segundos
+                setTimeout(() => {
+                    carregarPais();
+                }, 2500);
+            }
+        }
+
+        function tocarSomSucesso() {
+            const contextoAudio = new (window.AudioContext || window.webkitAudioContext)();
+            const oscilador = contextoAudio.createOscillator();
+            const ganho = contextoAudio.createGain();
+            oscilador.type = 'sine';
+            oscilador.frequency.setValueAtTime(523.25, contextoAudio.currentTime); // Nota C5
+            oscilador.frequency.setValueAtTime(659.25, contextoAudio.currentTime + 0.1); // Nota E5
+            ganho.gain.setValueAtTime(0.1, contextoAudio.currentTime);
+            oscilador.connect(ganho);
+            ganho.connect(contextoAudio.destination);
+            oscilador.start();
+            oscilador.stop(contextoAudio.currentTime + 0.3);
+        }
+
+        // Iniciar o primeiro país quando a página abre
+        carregarPais();
+    </script>
+</body>
